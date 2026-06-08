@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cervejaria Império — Pedidos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'Barlow', sans-serif;
+    background: #0a0a0a;
+    color: #f0e8c8;
+    min-height: 100vh;
+  }
+
+  .imp-header {
+    background: #111;
+    border-bottom: 2px solid #c9a227;
+    padding: 24px 16px 20px;
+    text-align: center;
+  }
+
+  .imp-logo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .imp-crown { font-size: 38px; color: #c9a227; line-height: 1; }
+
+  .imp-brand {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #c9a227;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .imp-ornament { color: #c9a227; font-size: 11px; letter-spacing: 6px; opacity: 0.5; }
+
+  .imp-subtitle {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: #7a6930;
+    text-transform: uppercase;
+  }
+
+  .imp-body {
+    padding: 24px 16px 40px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .imp-section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #c9a227;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .imp-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #c9a22740;
+  }
+
+  .imp-selectors {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 480px) {
+    .imp-selectors { grid-template-columns: 1fr; }
+    .imp-brand { font-size: 19px; letter-spacing: 2px; }
+  }
+
+  .imp-select-wrapper { position: relative; }
+
+  .imp-select-wrapper label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #7a6930;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .imp-select {
+    width: 100%;
+    background: #111;
+    border: 1px solid #c9a22760;
+    color: #f0e8c8;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    padding: 12px 36px 12px 14px;
+    border-radius: 4px;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .imp-select:focus { border-color: #c9a227; }
+
+  .imp-select-arrow {
+    position: absolute;
+    right: 12px;
+    bottom: 14px;
+    color: #c9a227;
+    pointer-events: none;
+    font-size: 14px;
+  }
+
+  .imp-date-input {
+    width: 100%;
+    background: #111;
+    border: 1px solid #c9a22760;
+    color: #f0e8c8;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    padding: 12px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .imp-date-input:focus { border-color: #c9a227; }
+  .imp-date-input::-webkit-calendar-picker-indicator {
+    filter: invert(0.7) sepia(1) saturate(2) hue-rotate(5deg);
+    cursor: pointer;
+  }
+
+  .imp-search {
+    width: 100%;
+    background: #111;
+    border: 1px solid #c9a22740;
+    color: #f0e8c8;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 4px;
+    outline: none;
+    margin-bottom: 10px;
+  }
+
+  .imp-search::placeholder { color: #3a3020; }
+  .imp-search:focus { border-color: #c9a22780; }
+
+  .imp-product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 28px;
+  }
+
+  .imp-item {
+    display: flex;
+    align-items: center;
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 4px;
+    padding: 10px 12px;
+    gap: 10px;
+    transition: border-color 0.15s;
+  }
+
+  .imp-item.has-qty {
+    border-color: #c9a22760;
+    background: #141208;
+  }
+
+  .imp-item-name {
+    flex: 1;
+    font-size: 13px;
+    color: #a09060;
+    line-height: 1.3;
+  }
+
+  .imp-item.has-qty .imp-item-name { color: #f0e8c8; }
+
+  .imp-qty-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .imp-btn-qty {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid #c9a22760;
+    background: #1a1a1a;
+    color: #c9a227;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s;
+    font-weight: 600;
+    padding: 0;
+  }
+
+  .imp-btn-qty:hover { background: #c9a22720; }
+  .imp-btn-qty:active { background: #c9a22740; }
+
+  .imp-qty-num {
+    min-width: 24px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #c9a227;
+  }
+
+  .imp-btn-resumo {
+    width: 100%;
+    background: #c9a227;
+    color: #0a0a0a;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 4px;
+    padding: 17px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .imp-btn-resumo:hover { background: #e0b530; }
+  .imp-btn-resumo:active { opacity: 0.9; }
+
+  .imp-badge {
+    display: inline-block;
+    background: #c9a22720;
+    border: 1px solid #c9a22750;
+    color: #c9a227;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* MODAL */
+  .imp-modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 1000;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 12px;
+    overflow-y: auto;
+  }
+
+  .imp-modal-bg.open { display: flex; }
+
+  .imp-modal {
+    background: #0e0e0e;
+    border: 1px solid #c9a22780;
+    border-radius: 6px;
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .imp-modal-header {
+    background: #c9a227;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .imp-modal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #0a0a0a;
+    text-transform: uppercase;
+  }
+
+  .imp-modal-close {
+    background: none;
+    border: none;
+    color: #0a0a0a;
+    font-size: 26px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.7;
+  }
+
+  .imp-modal-close:hover { opacity: 1; }
+
+  .imp-modal-body { padding: 20px; }
+
+  .imp-resumo-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .imp-resumo-info-item {
+    background: #141208;
+    border: 1px solid #c9a22730;
+    border-radius: 4px;
+    padding: 10px 12px;
+  }
+
+  .imp-resumo-info-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #7a6930;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .imp-resumo-info-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f0e8c8;
+    word-break: break-word;
+  }
+
+  .imp-resumo-divider {
+    border: none;
+    border-top: 1px solid #c9a22730;
+    margin: 16px 0;
+  }
+
+  .imp-resumo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .imp-resumo-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #141208;
+    border-radius: 3px;
+    border-left: 2px solid #c9a227;
+  }
+
+  .imp-resumo-qty {
+    font-size: 14px;
+    font-weight: 700;
+    color: #c9a227;
+    min-width: 26px;
+    text-align: right;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .imp-resumo-name {
+    font-size: 12px;
+    color: #c0b48a;
+    line-height: 1.35;
+    flex: 1;
+  }
+
+  .imp-resumo-total {
+    background: #c9a22715;
+    border: 1px solid #c9a22740;
+    border-radius: 4px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+  }
+
+  .imp-resumo-total-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #7a6930;
+    text-transform: uppercase;
+  }
+
+  .imp-resumo-total-value {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #c9a227;
+  }
+
+  .imp-resumo-empty {
+    text-align: center;
+    padding: 30px 0;
+    color: #3a3020;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+
+  .imp-modal-footer {
+    padding: 0 20px 18px;
+    text-align: center;
+    font-size: 10px;
+    color: #3a3020;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 14px;
+  }
+
+  .imp-products-section { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<header class="imp-header">
+  <div class="imp-logo-wrap">
+    <div class="imp-crown">♛</div>
+    <div class="imp-brand">Cervejaria Império</div>
+    <div class="imp-ornament">— ✦ —</div>
+    <div class="imp-subtitle">Sistema de Pedidos</div>
+  </div>
+</header>
+
+<main class="imp-body">
+
+  <div class="imp-section-title">Identificação</div>
+  <div class="imp-selectors">
+    <div class="imp-select-wrapper">
+      <label for="sel-vendedor">Vendedor</label>
+      <select class="imp-select" id="sel-vendedor">
+        <option value="">Selecionar...</option>
+        <option>Lucas da Conceicao de Jesus</option>
+        <option>Luiz Tristao Almeida Junior</option>
+        <option>Patrick Jordao Gonzalez</option>
+        <option>Gilson Vieira</option>
+        <option>Agatha Helena Nunes de Souza</option>
+        <option>Rinaldo dos Santos Sa Augustin</option>
+        <option>Stephanie Paschoal Silva Gusmão</option>
+        <option>Vandilson Bonifacio</option>
+        <option>Luiz Claudio dos Santos</option>
+        <option>Rarinka Bueno de Castro</option>
+      </select>
+      <span class="imp-select-arrow">▾</span>
+    </div>
+    <div class="imp-select-wrapper">
+      <label for="sel-data">Data do Pedido</label>
+      <input type="date" class="imp-date-input" id="sel-data" />
+    </div>
+  </div>
+
+  <div class="imp-products-section">
+    <div class="imp-section-title">
+      Produtos
+      <span id="badge-count" class="imp-badge" style="display:none">0</span>
+    </div>
+    <input type="text" class="imp-search" id="busca" placeholder="Buscar produto..." autocomplete="off" />
+    <div class="imp-product-list" id="product-list"></div>
+  </div>
+
+  <button class="imp-btn-resumo" onclick="abrirResumo()">Ver Resumo do Pedido</button>
+
+</main>
+
+<!-- MODAL RESUMO -->
+<div class="imp-modal-bg" id="modal-bg">
+  <div class="imp-modal">
+    <div class="imp-modal-header">
+      <span class="imp-modal-title">Resumo do Pedido</span>
+      <button class="imp-modal-close" onclick="fecharModal()" aria-label="Fechar">×</button>
+    </div>
+    <div class="imp-modal-body">
+      <div class="imp-resumo-info">
+        <div class="imp-resumo-info-item">
+          <div class="imp-resumo-info-label">Vendedor</div>
+          <div class="imp-resumo-info-value" id="r-vendedor">—</div>
+        </div>
+        <div class="imp-resumo-info-item">
+          <div class="imp-resumo-info-label">Data</div>
+          <div class="imp-resumo-info-value" id="r-data">—</div>
+        </div>
+      </div>
+      <hr class="imp-resumo-divider" />
+      <div class="imp-resumo-list" id="resumo-itens"></div>
+      <div class="imp-resumo-total">
+        <span class="imp-resumo-total-label">Total de itens</span>
+        <span class="imp-resumo-total-value" id="r-total">0</span>
+      </div>
+    </div>
+    <div class="imp-modal-footer">Cervejaria Império · Sistema de Pedidos</div>
+  </div>
+</div>
+
+<script>
+const produtos = [
+  "Cachaca do Doto Prata 700ml Vdro C/1u",
+  "Cachaca do Doto Umburana 700ml Vdro C/1u",
+  "Cachaca Doto Barril Blend 700 Ml",
+  "Gin Beverley 900ml Grf C/1un",
+  "Licor 46 Expresiones 700ml",
+  "Licor Don Leche Doce de Leite 500ml 1un",
+  "Limoncello Licor Crm Limao Gf 500ml C/1",
+  "Limoncello Licor Fn Limao Gf 500ml C/1",
+  "Peritiv Aperitivo de Ervas 750ml",
+  "Ruby Royale Aperitivo Bitter 750ml",
+  "Velvo Artice Gin 800ml 1un Vdr",
+  "Velvo Botanic Gin 800ml 1un Vdr",
+  "Vh Valle de Chillan Br Chardonnay 750x1",
+  "Vh Valle de Chillan Rose Syrah 750 Ml",
+  "Vh Valle de Chillan Sel Cabernet Sauvign 750 Ml",
+  "Vh Valle de Chillan Tt Caber Sauvi 750x1",
+  "Vh Valle de Chillan Tt Grrescabsau 750x1",
+  "Vh Valle de Chillan Tt Rescab Sauv 750x1",
+  "Vodka Leev 750ml Cx/1",
+  "Vodka Olsk 900 Ml Grf c/1 un"
+];
+
+const qtds = {};
+produtos.forEach(p => qtds[p] = 0);
+
+function setDataHoje() {
+  const hoje = new Date();
+  const y = hoje.getFullYear();
+  const m = String(hoje.getMonth() + 1).padStart(2, '0');
+  const d = String(hoje.getDate()).padStart(2, '0');
+  document.getElementById('sel-data').value = `${y}-${m}-${d}`;
+}
+
+function renderList(filtro) {
+  const f = (filtro || '').toLowerCase();
+  const lista = produtos.filter(p => p.toLowerCase().includes(f));
+  const container = document.getElementById('product-list');
+  container.innerHTML = lista.map(p => {
+    const q = qtds[p];
+    const id = 'item_' + p.replace(/[^a-zA-Z0-9]/g, '_');
+    return `<div class="imp-item${q > 0 ? ' has-qty' : ''}" id="${id}">
+      <div class="imp-item-name">${p}</div>
+      <div class="imp-qty-ctrl">
+        <button class="imp-btn-qty" onclick="mudar('${p.replace(/'/g, "\\'")}', -1)" aria-label="Diminuir">−</button>
+        <span class="imp-qty-num">${q}</span>
+        <button class="imp-btn-qty" onclick="mudar('${p.replace(/'/g, "\\'")}', 1)" aria-label="Aumentar">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mudar(prod, delta) {
+  qtds[prod] = Math.max(0, (qtds[prod] || 0) + delta);
+  atualizarBadge();
+  renderList(document.getElementById('busca').value);
+}
+
+function atualizarBadge() {
+  const total = Object.values(qtds).reduce((a, b) => a + b, 0);
+  const badge = document.getElementById('badge-count');
+  if (total > 0) { badge.style.display = 'inline-block'; badge.textContent = total; }
+  else { badge.style.display = 'none'; }
+}
+
+function abrirResumo() {
+  const vendedor = document.getElementById('sel-vendedor').value || '—';
+  const dataVal = document.getElementById('sel-data').value;
+  let dataFmt = '—';
+  if (dataVal) {
+    const [y, m, d] = dataVal.split('-');
+    dataFmt = `${d}/${m}/${y}`;
+  }
+  document.getElementById('r-vendedor').textContent = vendedor || '—';
+  document.getElementById('r-data').textContent = dataFmt;
+
+  const selecionados = produtos.filter(p => qtds[p] > 0);
+  const totalUnid = selecionados.reduce((a, p) => a + qtds[p], 0);
+
+  const itensEl = document.getElementById('resumo-itens');
+  if (selecionados.length === 0) {
+    itensEl.innerHTML = '<div class="imp-resumo-empty">Nenhum item selecionado</div>';
+  } else {
+    itensEl.innerHTML = selecionados.map(p =>
+      `<div class="imp-resumo-row">
+        <span class="imp-resumo-qty">${qtds[p]}x</span>
+        <span class="imp-resumo-name">${p}</span>
+      </div>`
+    ).join('');
+  }
+  document.getElementById('r-total').textContent = totalUnid + (totalUnid === 1 ? ' unidade' : ' unidades');
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function fecharModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+}
+
+document.getElementById('modal-bg').addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+
+document.getElementById('busca').addEventListener('input', e => renderList(e.target.value));
+
+setDataHoje();
+renderList();
+</script>
+</body>
+</html>
